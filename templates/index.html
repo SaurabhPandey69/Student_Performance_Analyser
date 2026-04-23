@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Performance Analyzer | AI-Powered Predictions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            animation: slideDown 0.5s ease;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+
+        /* Button */
+        .predict-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .predict-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Results Section */
+        .results-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .score-display {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .score-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .performance-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .performance-High {
+            background: #4caf50;
+            color: white;
+        }
+
+        .performance-Medium {
+            background: #ff9800;
+            color: white;
+        }
+
+        .performance-Low {
+            background: #f44336;
+            color: white;
+        }
+
+        /* Recommendations */
+        .recommendation-item {
+            background: white;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .rec-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .rec-area {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .rec-impact {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .impact-High {
+            background: #ff9800;
+            color: white;
+        }
+
+        .impact-Medium {
+            background: #2196f3;
+            color: white;
+        }
+
+        .impact-Low {
+            background: #4caf50;
+            color: white;
+        }
+
+        .impact-Critical {
+            background: #f44336;
+            color: white;
+        }
+
+        /* Loading Animation */
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        /* Feature Importance */
+        .feature-bar {
+            margin-bottom: 15px;
+        }
+
+        .feature-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .bar {
+            height: 30px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 5px;
+            transition: width 1s ease;
+        }
+
+        /* Animations */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* Tooltips */
+        .info-icon {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            background: #ccc;
+            color: white;
+            text-align: center;
+            border-radius: 50%;
+            font-size: 12px;
+            cursor: help;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Student Performance Analyzer</h1>
+            <p>AI-powered prediction system using Decision Tree Algorithm</p>
+        </div>
+
+        <div class="main-grid">
+            <!-- Input Form -->
+            <div class="card">
+                <h2>📝 Student Information</h2>
+                <form id="predictionForm">
+                    <div class="form-group">
+                        <label>Study Hours per Day</label>
+                        <input type="number" id="studyHours" required min="0" max="12" step="1" value="6">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Attendance Percentage</label>
+                        <input type="number" id="attendance" required min="0" max="100" step="1" value="85">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Previous Exam Score (%)</label>
+                        <input type="number" id="previousScore" required min="0" max="100" step="1" value="70">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Sleep Hours per Day</label>
+                        <input type="number" id="sleepHours" required min="0" max="12" step="1" value="7">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Extracurricular Activities</label>
+                        <select id="extracurricular">
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Parent Education Level</label>
+                        <select id="parentEducation">
+                            <option value="High School">High School</option>
+                            <option value="Bachelor">Bachelor</option>
+                            <option value="Master">Master</option>
+                            <option value="PhD">PhD</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Internet Access at Home</label>
+                        <select id="internetAccess">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="predict-btn">🔮 Predict Performance</button>
+                </form>
+            </div>
+
+            <!-- Feature Importance -->
+            <div class="card">
+                <h2>📊 Feature Importance</h2>
+                <div id="featureImportance">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading feature importance...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div id="results" class="results-section" style="display: none;">
+            <h2>🎯 Prediction Results</h2>
+            <div id="resultsContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Load feature importance on page load
+        async function loadFeatureImportance() {
+            try {
+                const response = await fetch('/api/feature-importance');
+                const data = await response.json();
+                
+                const container = document.getElementById('featureImportance');
+                container.innerHTML = '';
+                
+                data.feature_importance.forEach(item => {
+                    const percentage = (item.importance * 100).toFixed(1);
+                    const featureDiv = document.createElement('div');
+                    featureDiv.className = 'feature-bar';
+                    featureDiv.innerHTML = `
+                        <div class="feature-label">
+                            <span>${formatFeatureName(item.feature)}</span>
+                            <span>${percentage}%</span>
+                        </div>
+                        <div class="bar" style="width: 0%"></div>
+                    `;
+                    container.appendChild(featureDiv);
+                    
+                    // Animate the bar
+                    setTimeout(() => {
+                        featureDiv.querySelector('.bar').style.width = `${percentage}%`;
+                    }, 100);
+                });
+            } catch (error) {
+                console.error('Error loading feature importance:', error);
+                document.getElementById('featureImportance').innerHTML = 
+                    '<p style="color: red;">Error loading feature importance</p>';
+            }
+        }
+
+        function formatFeatureName(feature) {
+            const names = {
+                'Study_Hours': '📚 Study Hours',
+                'Attendance': '📅 Attendance',
+                'Previous_Score': '📝 Previous Score',
+                'Sleep_Hours': '😴 Sleep Hours',
+                'Extracurricular': '🎯 Extracurricular',
+                'Parent_Education': '👨‍👩‍👧 Parent Education',
+                'Internet_Access': '🌐 Internet Access'
+            };
+            return names[feature] || feature;
+        }
+
+        // Handle form submission
+        document.getElementById('predictionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Collect form data
+            const studentData = {
+                study_hours: parseInt(document.getElementById('studyHours').value),
+                attendance: parseInt(document.getElementById('attendance').value),
+                previous_score: parseFloat(document.getElementById('previousScore').value),
+                sleep_hours: parseInt(document.getElementById('sleepHours').value),
+                extracurricular: document.getElementById('extracurricular').value,
+                parent_education: document.getElementById('parentEducation').value,
+                internet_access: document.getElementById('internetAccess').value
+            };
+            
+            // Show loading state
+            const resultsDiv = document.getElementById('results');
+            const resultsContent = document.getElementById('resultsContent');
+            resultsDiv.style.display = 'block';
+            resultsContent.innerHTML = '<div class="loading"><div class="spinner"></div><p>Analyzing student data...</p></div>';
+            
+            try {
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(studentData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayResults(data);
+                } else {
+                    resultsContent.innerHTML = '<p style="color: red;">Error: Could not make prediction</p>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                resultsContent.innerHTML = '<p style="color: red;">Error connecting to server</p>';
+            }
+        });
+        
+        function displayResults(data) {
+            const resultsContent = document.getElementById('resultsContent');
+            
+            const performanceClass = `performance-${data.predicted_performance}`;
+            const confidencePercent = (data.confidence * 100).toFixed(1);
+            
+            let recommendationsHtml = '';
+            data.recommendations.forEach(rec => {
+                recommendationsHtml += `
+                    <div class="recommendation-item">
+                        <div class="rec-header">
+                            <span class="rec-area">${rec.area}</span>
+                            <span class="rec-impact impact-${rec.impact}">${rec.impact} Impact</span>
+                        </div>
+                        <div><strong>Current:</strong> ${rec.current}</div>
+                        <div><strong>Suggestion:</strong> ${rec.suggestion}</div>
+                    </div>
+                `;
+            });
+            
+            resultsContent.innerHTML = `
+                <div class="result-card">
+                    <div class="score-display">
+                        <div class="score-number">${data.predicted_score}%</div>
+                        <div class="performance-badge ${performanceClass}">
+                            ${data.predicted_performance} Performance
+                        </div>
+                        <div style="margin-top: 10px; color: #666;">
+                            Confidence: ${confidencePercent}%
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h3>💡 Personalized Recommendations</h3>
+                    ${recommendationsHtml || '<p>Great job! Keep up the good work! 🎉</p>'}
+                </div>
+                
+                <div class="result-card">
+                    <h3>📊 Key Factors Analyzed</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr style="border-bottom: 1px solid #ddd;">
+                            <th style="text-align: left; padding: 8px;">Factor</th>
+                            <th style="text-align: left; padding: 8px;">Value</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;">Study Hours</td>
+                            <td style="padding: 8px;">${data.input_data.Study_Hours} hours/day</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;">Attendance</td>
+                            <td style="padding: 8px;">${data.input_data.Attendance}%</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;">Previous Score</td>
+                            <td style="padding: 8px;">${data.input_data.Previous_Score}%</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px;">Sleep Hours</td>
+                            <td style="padding: 8px;">${data.input_data.Sleep_Hours} hours/day</td>
+                        </tr>
+                    </table>
+                </div>
+            `;
+            
+            // Smooth scroll to results
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Load feature importance on page load
+        loadFeatureImportance();
+    </script>
+</body>
+</html>
